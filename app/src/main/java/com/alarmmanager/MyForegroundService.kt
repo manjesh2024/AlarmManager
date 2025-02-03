@@ -50,16 +50,29 @@ class MyForegroundService : Service() {
         serviceScope.cancel() // Cancel coroutines to avoid memory leaks
         mediaPlayer?.release() // Release MediaPlayer
         mediaPlayer = null
+
+
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun createNotification(content: String): Notification {
+        val openAppIntent = Intent(this, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            openAppIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Foreground Service")
             .setContentText(content)
+            .setContentIntent(pendingIntent)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
             .build()
     }
 
@@ -73,6 +86,7 @@ class MyForegroundService : Service() {
             getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
         }
     }
+
 
     companion object {
         private const val CHANNEL_ID = "ForegroundServiceChannel"
