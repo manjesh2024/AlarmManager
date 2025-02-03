@@ -3,11 +3,14 @@ package com.alarmmanager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.IBinder
+import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,10 +22,11 @@ import kotlinx.coroutines.launch
 class MyForegroundService : Service() {
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
+    private var mediaPlayer: MediaPlayer? = null
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        mediaPlayer = MediaPlayer.create(this, R.raw.beep) // Load beep sound
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -32,8 +36,10 @@ class MyForegroundService : Service() {
         serviceScope.launch {
             while (true) {
                 // Simulating background work (e.g., downloading, syncing, etc.)
+                mediaPlayer?.start() // Play beep
+
                 println("Background task running...")
-                delay(3000) // Simulate work every 3 seconds
+                delay(20000) // Simulate work every 20 Sec now
             }
         }
         return START_STICKY
@@ -42,6 +48,8 @@ class MyForegroundService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel() // Cancel coroutines to avoid memory leaks
+        mediaPlayer?.release() // Release MediaPlayer
+        mediaPlayer = null
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -51,7 +59,7 @@ class MyForegroundService : Service() {
             .setContentTitle("Foreground Service")
             .setContentText(content)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
     }
 
