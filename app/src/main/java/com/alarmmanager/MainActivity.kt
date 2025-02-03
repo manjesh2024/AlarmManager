@@ -1,19 +1,9 @@
 package com.alarmmanager
 
-import com.alarmmanager.other.MyForeService
-import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
+
 import android.os.Bundle
-import android.provider.Settings
 import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.alarmmanager.other.AlarmReceiver
 
 class MainActivity : AppCompatActivity() {
 
